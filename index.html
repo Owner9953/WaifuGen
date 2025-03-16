@@ -1,0 +1,592 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Waifu Generator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    /* General Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to bottom, #343a40, #0D1117);
+      color: #e0e0e0;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      backdrop-filter: blur(10px);
+    }
+
+    a {
+      color: #64b5f6;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    a:hover {
+      color: #81d4fa;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: flex;
+      width: 100%;
+      flex-grow: 1;
+      padding: 20px;
+    }
+
+    .sidebar {
+      width: 280px;
+      background-color: rgba(33, 37, 41, 0.7);
+      border-right: 1px solid #495057;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      margin-right: 20px;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-radius: 12px;
+      background-color: rgba(33, 37, 41, 0.7);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .container {
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      max-width: 900px;
+      width: 100%;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      border: 1px solid #495057;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 2.8em;
+      margin-bottom: 25px;
+      color: #64b5f6;
+      text-shadow: 0 0 12px rgba(100, 181, 246, 0.7);
+    }
+
+    p {
+      color: #90a4ae;
+      margin-bottom: 35px;
+      font-size: 1.1em;
+    }
+
+    #waifuImage {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin-top: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s;
+      border: 1px solid #495057;
+    }
+
+    #waifuImage:hover {
+      transform: scale(1.03);
+    }
+
+    button {
+      background-color: #388e3c;
+      border: none;
+      color: white;
+      padding: 14px 28px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 1.1em;
+      margin: 10px 5px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    button:hover {
+      background-color: #43a047;
+      transform: translateY(-3px);
+      box-shadow: 0 7px 14px rgba(0, 0, 0, 0.5);
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 35px;
+      width: 100%;
+    }
+
+    .option-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 10px;
+      color: #cfd8dc;
+      font-size: 1em;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    select,
+    input[type="checkbox"] {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #495057;
+      background-color: rgba(33, 37, 41, 0.5);
+      color: #eceff1;
+      font-size: 1em;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      margin-bottom: 18px;
+    }
+
+    select:focus,
+    input[type="checkbox"]:focus {
+      border-color: #64b5f6;
+      box-shadow: 0 0 10px rgba(100, 181, 246, 0.5);
+    }
+
+    input[type="checkbox"] {
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border: 2px solid #495057;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      margin-bottom: 0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    input[type="checkbox"]:checked {
+      background-color: #64b5f6;
+      border-color: #64b5f6;
+    }
+
+    input[type="checkbox"]:checked::before {
+      content: '✔';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #212529;
+      font-size: 14px;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .tag {
+      background-color: #343a40;
+      color: #90a4ae;
+      padding: 8px 16px;
+      border-radius: 18px;
+      font-size: 0.9em;
+      transition: background-color 0.3s, color 0.3s;
+      border: 1px solid #495057;
+    }
+
+    .tag:hover {
+      background-color: #64b5f6;
+      color: #212529;
+    }
+
+    /* Footer Styles */
+    footer {
+      text-align: center;
+      padding: 12px;
+      font-size: 0.8em;
+      color: #90a4ae;
+      backdrop-filter: blur(10px);
+    }
+
+    /* New Styles */
+    .sidebar h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #64b5f6;
+      text-shadow: 0 0 10px rgba(100, 181, 246, 0.6);
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      background-color: rgba(52, 58, 64, 0.6);
+      color: #eceff1;
+      text-decoration: none;
+      transition: background-color 0.3s, color 0.3s;
+      border: 1px solid #495057;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background-color: #64b5f6;
+      color: #212529;
+    }
+
+    .sidebar .options {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <h1>WaifuGen</h1>
+      <div class="options">
+        <div class="option-group">
+          <label for="databaseSelect">Database:</label>
+          <select id="databaseSelect">
+            <option value="waifuim">IM</option>
+            <option value="waifupics">PICS</option>
+          </select>
+        </div>
+
+        <div class="option-group">
+          <label for="categorySelect">Category:</label>
+          <select id="categorySelect">
+          </select>
+        </div>
+
+        <div class="option-group">
+          <label for="gifCheckbox">Animated GIF:</label>
+          <input type="checkbox" id="gifCheckbox" disabled>
+        </div>
+
+        <div class="option-group">
+          <label for="nsfwSelect">NSFW (18+):</label>
+          <select id="nsfwSelect">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+
+        <div class="option-group">
+          <label for="orientationSelect">Orientation:</label>
+          <select id="orientationSelect" style="display: none;">
+            <option value="PORTRAIT">Portrait</option>
+            <option value="LANDSCAPE">Landscape</option>
+          </select>
+        </div>
+      </div>
+      <button id="generateBtn">Generate Waifu</button>
+    </aside>
+
+    <main class="main-content">
+      <div class="container">
+        <p>Unleash your imagination and create the perfect AI companion!</p>
+        <div id="imageContainer"></div>
+        <button id="downloadBtn" style="display: none;">Download Waifu</button>
+        <div id="tagCloud" class="tag-cloud"></div>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    These Waifus are made by real people around the world.
+    <br>
+    Made with by <a href="https://eer.su/Owner">Owner9953</a>
+  </footer>
+
+  <script>
+    const generateBtn = document.getElementById('generateBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const imageContainer = document.getElementById('imageContainer');
+    const tagCloud = document.getElementById('tagCloud');
+    const databaseSelect = document.getElementById('databaseSelect');
+    const categorySelect = document.getElementById('categorySelect');
+    const gifCheckbox = document.getElementById('gifCheckbox');
+    const orientationSelect = document.getElementById('orientationSelect');
+
+    const waifuImCategories = [
+      "waifu", "maid", "marin-kitagawa", "mori-calliope", "raiden-shogun", "oppai", "selfies", "uniform"
+    ];
+    const waifuPicsSfwCategories = [
+      "waifu", "neko", "shinobu", "megumin", "bully", "cuddle", "cry", "hug", "awoo", "kiss", "lick", "pat", "smug",
+      "bonk", "yeet", "blush", "smile", "wave", "highfive", "handhold", "nom", "bite", "glomp", "slap", "kill", "kick",
+      "happy", "wink", "poke", "dance", "cringe"
+    ];
+    const waifuPicsNsfwCategories = ["waifu", "neko", "trap", "blowjob"];
+
+    const waifuImDetailedCategories = {
+      "versatile": [
+        {
+          "tag_id": 13,
+          "name": "maid",
+          "description": "Cute womans or girl employed to do domestic work in their working uniform.",
+          "is_nsfw": false
+        },
+        {
+          "tag_id": 12,
+          "name": "waifu",
+          "description": "A female anime/manga character.",
+          "is_nsfw": false
+        },
+        {
+          "tag_id": 5,
+          "name": "marin-kitagawa",
+          "description": "One of two main protagonists (alongside Wakana Gojo) in the anime and manga series My Dress-Up Darling.",
+          "is_nsfw": false
+        },
+        {
+          "tag_id": 14,
+          "name": "mori-calliope",
+          "description": "Mori Calliope is an English Virtual YouTuber (VTuber) associated with hololive as part of its first-generation English branch of Vtubers.",
+          "is_nsfw": false
+        },
+        {
+          "tag_id": 15,
+          "name": "raiden-shogun",
+          "description": "Genshin Impact's Raiden Shogun is a fierce lady in the Genshin ranks.",
+          "is_nsfw": false
+        },
+        {
+          "tag_id": 7,
+          "name": "oppai",
+          "description": "Girls with large breasts",
+          "is_nsfw": false
+        },
+        {
+          "tag_id": 10,
+          "name": "selfies",
+          "description": "A photo-like image of a waifu.",
+          "is_nsfw": false
+        },
+        {
+          "tag_id": 11,
+          "name": "uniform",
+          "description": "Girls wearing any kind of uniform, cosplay etc... ",
+          "is_nsfw": false
+        },
+        {
+          "tag_id": 17,
+          "name": "kamisato-ayaka",
+          "description": "Kamisato Ayaka is a playable Cryo character in Genshin Impact.",
+          "is_nsfw": false
+        }
+      ],
+      "nsfw": [
+        {
+          "tag_id": 1,
+          "name": "ass",
+          "description": "Girls with a large butt. ",
+          "is_nsfw": true
+        },
+        {
+          "tag_id": 4,
+          "name": "hentai",
+          "description": "Explicit sexual content.",
+          "is_nsfw": true
+        },
+        {
+          "tag_id": 6,
+          "name": "milf",
+          "description": "A sexually attractive middle-aged woman.",
+          "is_nsfw": true
+        },
+        {
+          "tag_id": 8,
+          "name": "oral",
+          "description": "Oral sex content.",
+          "is_nsfw": true
+        },
+        {
+          "tag_id": 9,
+          "name": "paizuri",
+          "description": "A subcategory of hentai that involves breast sex, also known as titty fucking.",
+          "is_nsfw": true
+        },
+        {
+          "tag_id": 2,
+          "name": "ecchi",
+          "description": "Slightly explicit sexual content. Show full to partial nudity. Doesn't show any genital.",
+          "is_nsfw": true
+        },
+        {
+          "tag_id": 3,
+          "name": "ero",
+          "description": "Any kind of erotic content, basically any nsfw image.",
+          "is_nsfw": true
+        }
+      ]
+    };
+
+    generateBtn.addEventListener('click', generateWaifu);
+    downloadBtn.addEventListener('click', downloadWaifu);
+    databaseSelect.addEventListener('change', populateCategories);
+
+    function populateCategories() {
+      const selectedDatabase = databaseSelect.value;
+      categorySelect.innerHTML = '';
+
+      let categories;
+      if (selectedDatabase === 'waifuim') {
+        categories = waifuImDetailedCategories[document.getElementById('nsfwSelect').value === 'true' ? 'nsfw' : 'versatile'];
+        gifCheckbox.disabled = false;
+        orientationSelect.style.display = 'block';
+      } else if (selectedDatabase === 'waifupics') {
+        categories = document.getElementById('nsfwSelect').value === 'true' ? waifuPicsNsfwCategories : waifuPicsSfwCategories;
+        gifCheckbox.disabled = true;
+        orientationSelect.style.display = 'none';
+
+      }
+
+      categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.name || category;
+        option.textContent = category.name || category;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    document.getElementById('nsfwSelect').addEventListener('change', () => {
+      if (databaseSelect.value === 'waifuim' || databaseSelect.value === 'waifupics') {
+        populateCategories();
+      }
+    });
+
+    populateCategories();
+
+    async function generateWaifu() {
+      const selectedDatabase = databaseSelect.value;
+      const category = document.getElementById('categorySelect').value;
+      const isGif = document.getElementById('gifCheckbox').checked;
+      const nsfw = document.getElementById('nsfwSelect').value;
+      const orientation = document.getElementById('orientationSelect').value;
+
+      let apiUrl;
+      let params = {};
+
+      if (selectedDatabase === 'waifuim') {
+        apiUrl = `https://api.waifu.im/search`;
+        params = {
+          included_tags: category,
+          gif: isGif,
+          is_nsfw: nsfw,
+          orientation: orientation,
+        };
+      } else if (selectedDatabase === 'waifupics') {
+        apiUrl = `https://api.waifu.pics/${nsfw === 'true' ? 'nsfw' : 'sfw'}/${category}`;
+      }
+
+      try {
+        let response;
+        if (selectedDatabase === 'waifuim') {
+          const urlParams = new URLSearchParams(params);
+          response = await fetch(`${apiUrl}?${urlParams}`);
+        } else {
+          response = await fetch(apiUrl);
+        }
+        const data = await response.json();
+
+        let imageUrl, imageAlt;
+
+        if (selectedDatabase === 'waifuim') {
+          if (data.images && data.images.length > 0) {
+            imageUrl = data.images[0].url;
+            imageAlt = data.images[0].tags.map(tag => tag.name).join(', ');
+          } else {
+            throw new Error('No images found');
+          }
+        } else if (selectedDatabase === 'waifupics') {
+          imageUrl = data.url;
+          imageAlt = `Waifu image from ${category}`;
+        }
+
+        if (imageUrl) {
+          imageContainer.innerHTML = `
+            <img id="waifuImage" src="${imageUrl}" alt="Neon waifu image: ${imageAlt}">
+          `;
+
+          // Update Favicon
+          updateFavicon(imageUrl);
+
+          downloadBtn.style.display = 'inline-block';
+
+          if (selectedDatabase === 'waifuim') {
+            tagCloud.innerHTML = data.images[0].tags.map(tag =>
+              `<span class="tag">${tag.name}</span>`
+            ).join('');
+          } else {
+            tagCloud.innerHTML = `<span class="tag">${category}</span>`;
+          }
+        } else {
+          imageContainer.innerHTML = '<p>Failed to load waifu image. Please try again or adjust your options.</p>';
+          tagCloud.innerHTML = '';
+          downloadBtn.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        imageContainer.innerHTML = '<p>An error occurred. Please try again later.</p>';
+        tagCloud.innerHTML = '';
+        downloadBtn.style.display = 'none';
+      }
+    }
+
+    async function downloadWaifu() {
+      const waifuImage = document.getElementById('waifuImage');
+      if (!waifuImage) return;
+
+      try {
+        const response = await fetch(waifuImage.src);
+        const blob = await response.blob();
+
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+
+        const fileExtension = blob.type.split('/')[1];
+        const filename = `waifu-${Date.now()}.${fileExtension}`;
+
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        window.URL.revokeObjectURL(downloadUrl);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('Download failed:', error);
+        alert('Failed to download image. Please try again.');
+      }
+    }
+
+    function updateFavicon(imageUrl) {
+      let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon';
+      link.rel = 'shortcut icon';
+      link.href = imageUrl;
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
+  </script>
+</body>
+
+</html>
