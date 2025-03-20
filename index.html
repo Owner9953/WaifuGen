@@ -1,6 +1,7 @@
 <html>
 
 <head>
+  <base href="https://waifu.io">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Waifu Generator</title>
@@ -293,6 +294,7 @@
         <div class="option-group">
           <label for="orientationSelect">Orientation:</label>
           <select id="orientationSelect" style="display: none;">
+            <option value="">Random</option>
             <option value="PORTRAIT">Portrait</option>
             <option value="LANDSCAPE">Landscape</option>
           </select>
@@ -492,7 +494,9 @@
           included_tags: category,
           gif: isGif,
           is_nsfw: nsfw,
-          orientation: orientation,
+        };
+        if (orientation) {
+          params.orientation = orientation;
         };
       } else if (selectedDatabase === 'waifupics') {
         apiUrl = `https://api.waifu.pics/${nsfw === 'true' ? 'nsfw' : 'sfw'}/${category}`;
